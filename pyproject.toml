@@ -1,0 +1,21 @@
+[project]
+name = "cs4100-group-project"
+version = "0.1.0"
+description = "Meal planner"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "numpy>=2.4.2",
+    "pandas>=3.0.1",
+    "pydantic>=2.12.5",
+    "requests>=2.32.5",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+]
+
+[dependency-groups]
+dev = [
+    "matplotlib>=3.10.8",
+    "pytest>=9.0.2",
+    "seaborn>=0.13.2",
+]
