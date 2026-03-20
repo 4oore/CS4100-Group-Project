@@ -1,0 +1,8 @@
+Github Copilot was used for autocomplete
+Claude Opus 4.6 was used for ideation and debugging
+
+Specific:
+Preprocess - ingesting usda data from multiple files and aggregating was written by claude
+Preprocess - batching data for OFF was ideated and implemented by claude
+utils - pretty print function is written by claude - this is a temporary function
+score - the scoring has been ideated with claude
