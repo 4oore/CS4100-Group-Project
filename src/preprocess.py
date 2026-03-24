@@ -35,7 +35,7 @@ def _parse_args():
     parser.add_argument(
         "--off_path",
         type=str,
-        default=str(_DATA_DIR / "en.openfoodfacts.org.products.tsv"),
+        default=str(_DATA_DIR / "en.openfoodfacts.org.products.csv"),
         help="path to OFF data TSV",
     )
     parser.add_argument(

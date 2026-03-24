@@ -1,13 +1,18 @@
 import pandas as pd
+from .score import fitness
 
 
 def print_plan(
     best_state: list,
-    remaining_slots: list,
+    remaining_slots: list[str],
     foods_df: pd.DataFrame,
-    targets: dict,
-    upper_limits: dict,
-    logged_today: dict,
+    targets: dict[str, float],
+    upper_limits: dict[str, float],
+    logged_today: dict[str, float],
+    score_cfg: dict[str, float],
+    preferences: dict[str, set[str]] | None = None,
+    logged_categories: list[str] | None = None,
+    follow_history: dict[str, dict[str, int]] | None = None,
 ) -> None:
     """Pretty-print the optimised meal plan and nutrient totals."""
 
@@ -41,3 +46,25 @@ def print_plan(
             limit = upper_limits[n]
             status = "  EXCEEDED" if combined > limit else "  within limit"
             print(f"  {n}: {combined:.1f} / {limit:.1f}{status}")
+
+    fit = fitness(
+        state=best_state,
+        remaining_slots=remaining_slots,
+        foods_df=foods_df,
+        logged=logged_today,
+        targets=targets,
+        upper_limits=upper_limits,
+        score_cfg=score_cfg,
+        preferences=preferences,
+        logged_categories=logged_categories,
+        follow_history=follow_history,
+    )
+
+    print("\nFitness Breakdown")
+    print(f"  NutritionScore:         {fit['nutrition']:.3f}")
+    print(f"  VarietyScore:           {fit['variety']:.3f}")
+    print(f"  MealCompatibilityScore: {fit['compatibility']:.3f}")
+    print(f"  UserPreferenceScore:    {fit['preference']:.3f}")
+    print(f"  Final Fitness:          {fit['fitness']:.3f}")
+    print(f"  Energy (1 - fitness):   {1.0 - fit['fitness']:.3f}")
+    print(f"  FollowThroughScore:     {fit['follow']:.3f}")
