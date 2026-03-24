@@ -1,5 +1,6 @@
 from src.data import load_foods
 from src.simulated_annealing import simulated_annealing
+from src.initialize import greedy_init
 import argparse
 from src.utils import print_plan
 
@@ -32,11 +33,23 @@ def _parse_args():
 
     # Initial State
     parser.add_argument(
+        "--greedy_init",
+        action="store_true",
+        help="generate initial state automatically using greedy initialization (recommended)",
+    )
+    parser.add_argument(
         "--initial_state",
         type=str,
         nargs="*",
-        default=["42,1.5", "137,1.0", "88,0.5"],
-        help="initial state as food_id,multiplier pairs e.g. --initial_state 42,1.5 137,1.0 88,0.5",
+        default=None,
+        help="manual initial state as food_id,multiplier pairs e.g. --initial_state 42,1.5 137,1.0 88,0.5 "
+             "(ignored if --greedy_init is set)",
+    )
+    parser.add_argument(
+        "--candidate_pool_size",
+        type=int,
+        default=50,
+        help="number of candidate foods evaluated per slot during greedy init (higher = better quality, slower)",
     )
 
     # Daily targets
@@ -177,13 +190,36 @@ def main():
         "portion_max": args.portion_max,
     }
 
-    initial_state = [
-        (int(s.split(",")[0]), float(s.split(",")[1])) for s in args.initial_state
-    ]
-
     foods = load_foods(args.foods_path)
 
     remaining_slots = [s for s in args.slots if s not in args.slots_done]
+
+    if args.greedy_init:
+        initial_state = greedy_init(
+            foods_df=foods,
+            logged=logged_today,
+            targets=targets,
+            n_slots=len(remaining_slots),
+            penalty_cfg=penalty_cfg,
+            candidate_pool_size=args.candidate_pool_size,
+            seed=args.seed,
+        )
+    else:
+        if args.initial_state is None:
+            parser_err = (
+                "No initial state provided. Pass --greedy_init to generate one "
+                "automatically, or supply --initial_state as food_id,multiplier pairs."
+            )
+            raise ValueError(parser_err)
+        initial_state = [
+            (int(s.split(",")[0]), float(s.split(",")[1])) for s in args.initial_state
+        ]
+        if len(initial_state) != len(remaining_slots):
+            raise ValueError(
+                f"--initial_state has {len(initial_state)} entries but there are "
+                f"{len(remaining_slots)} remaining slots {remaining_slots}. "
+                f"These must match, or use --greedy_init instead."
+            )
 
     best_state = simulated_annealing(
         foods, logged_today, initial_state, targets, upper_limits, sa_cfg, penalty_cfg
