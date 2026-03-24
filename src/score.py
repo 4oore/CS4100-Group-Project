@@ -31,13 +31,15 @@ def _safe_upper_limit_score(actual: float, limit: float, overshoot_weight: float
     return max(0.0, 1.0 - overshoot_weight * overshoot_ratio)
 
 
-def _category_to_slot_score(category: str, slot: str) -> float:
+def _category_to_slot_score(name: str, category: str, slot: str) -> float:
     """
     Rule-based food-meal compatibility score in [0, 1].
     Strongly penalizes snack/breakfast foods in lunch/dinner slots.
     """
     c = category.lower()
     s = slot.lower()
+    
+    text = f"{name} {category}".lower()
 
     breakfast_keywords = [
         "breakfast",
@@ -114,50 +116,50 @@ def _category_to_slot_score(category: str, slot: str) -> float:
     ]
 
     if s == "breakfast":
-        if any(k in c for k in breakfast_keywords):
+        if any(k in text for k in breakfast_keywords):
             return 1.0
-        if any(k in c for k in snack_keywords):
+        if any(k in text for k in snack_keywords):
             return 0.65
-        if any(k in c for k in meal_keywords):
+        if any(k in text for k in meal_keywords):
             return 0.20
-        if any(k in c for k in vegetable_keywords):
+        if any(k in text for k in vegetable_keywords):
             return 0.35
         return 0.35
 
     if s == "snack":
-        if any(k in c for k in snack_keywords):
+        if any(k in text for k in snack_keywords):
             return 1.0
-        if any(k in c for k in breakfast_keywords):
+        if any(k in text for k in breakfast_keywords):
             return 0.75
-        if any(k in c for k in meal_keywords):
+        if any(k in text for k in meal_keywords):
             return 0.20
-        if any(k in c for k in vegetable_keywords):
+        if any(k in text for k in vegetable_keywords):
             return 0.40
         return 0.40
 
     if s == "lunch":
-        if any(k in c for k in meal_keywords):
+        if any(k in text for k in meal_keywords):
             return 1.0
-        if any(k in c for k in vegetable_keywords):
+        if any(k in text for k in vegetable_keywords):
             return 0.75
-        if any(k in c for k in side_keywords):
+        if any(k in text for k in side_keywords):
             return 0.05
-        if any(k in c for k in breakfast_keywords):
+        if any(k in text for k in breakfast_keywords):
             return 0.05
-        if any(k in c for k in snack_keywords):
+        if any(k in text for k in snack_keywords):
             return 0.02
         return 0.15
 
     if s == "dinner":
-        if any(k in c for k in meal_keywords):
+        if any(k in text for k in meal_keywords):
             return 1.0
-        if any(k in c for k in vegetable_keywords):
+        if any(k in text for k in vegetable_keywords):
             return 0.75
-        if any(k in c for k in side_keywords):
+        if any(k in text for k in side_keywords):
             return 0.03
-        if any(k in c for k in breakfast_keywords):
+        if any(k in text for k in breakfast_keywords):
             return 0.02
-        if any(k in c for k in snack_keywords):
+        if any(k in text for k in snack_keywords):
             return 0.01
         return 0.10
 
@@ -276,8 +278,9 @@ def meal_compatibility_score(
     scores: list[float] = []
     for slot, (food_id, _) in zip(remaining_slots, state):
         row = foods_df.iloc[food_id]
+        name = str(row["name"])
         category = str(row["category"])
-        scores.append(_category_to_slot_score(category, slot))
+        scores.append(_category_to_slot_score(name, category, slot))
 
     return sum(scores) / len(scores)
 
