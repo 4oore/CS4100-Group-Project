@@ -109,6 +109,7 @@ python main.py \
   --greedy_init \
   --slots breakfast lunch dinner snack \
   --slots_done breakfast
+  --seed $RANDOM 
 ```
 
 ### Run with Genetic Algorithm
@@ -118,7 +119,8 @@ python main.py \
   --foods_path data/processed/foods.csv \
   --greedy_init \
   --slots breakfast lunch dinner snack \
-  --slots_done breakfast
+  --slots_done breakfast \
+  --seed $RANDOM
 ```
 
 ### IMportant Arguments
