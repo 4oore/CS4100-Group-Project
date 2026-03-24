@@ -93,7 +93,7 @@ data/
 ```bash
 python src/preprocess.py
 ```
-
+This generates:
 ```bash
 data/processed/foods.csv
 ```
