@@ -92,13 +92,13 @@ def _parse_args():
 
     # Penalty weights
     parser.add_argument(
-        "--w_nutrition", type=float, default=0.45, help="weight for nutrition score"
+        "--w_nutrition", type=float, default=0.35, help="weight for nutrition score"
     )
     parser.add_argument(
         "--w_variety", type=float, default=0.20, help="weight for variety score"
     )
     parser.add_argument(
-        "--w_compatibility", type=float, default=0.15, help="weight for meal compatibility score"
+        "--w_compatibility", type=float, default=0.25, help="weight for meal compatibility score"
     )
     parser.add_argument(
         "--w_preference", type=float, default=0.10, help="weight for user preference score"

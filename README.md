@@ -79,6 +79,10 @@ Where:
 pip install pandas numpy
 ```
 
+```bash
+pip install deep-translator
+```
+
 ### 2. Download datasets
 Download:
 	•	USDA FoodData Central (Foundation Foods)

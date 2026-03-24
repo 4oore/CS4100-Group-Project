@@ -33,54 +33,135 @@ def _safe_upper_limit_score(actual: float, limit: float, overshoot_weight: float
 
 def _category_to_slot_score(category: str, slot: str) -> float:
     """
-    Very simple rule-based food-meal compatibility.
-    Uses category keywords only, so it works with your current dataset.
+    Rule-based food-meal compatibility score in [0, 1].
+    Strongly penalizes snack/breakfast foods in lunch/dinner slots.
     """
     c = category.lower()
     s = slot.lower()
 
-    breakfast_keywords = ["breakfast", "egg", "cereal", "oat", "yogurt", "pancake", "waffle"]
-    snack_keywords = ["snack", "fruit", "bar", "nuts", "cracker", "cookie", "dessert"]
-    dinner_keywords = ["dinner", "beef", "pork", "chicken", "fish", "rice", "pasta", "meal"]
-    lunch_keywords = ["lunch", "sandwich", "salad", "wrap", "burger", "soup", "meal"]
+    breakfast_keywords = [
+        "breakfast",
+        "breakfast cereals",
+        "cereal",
+        "cereals",
+        "oat",
+        "oats",
+        "oatmeal",
+        "yogurt",
+        "granola",
+        "muesli",
+        "porridge",
+        "pancake",
+        "waffle",
+    ]
+
+    snack_keywords = [
+        "snack",
+        "snacks",
+        "cookies",
+        "biscuits",
+        "cracker",
+        "crackers",
+        "chips",
+        "crisps",
+        "rice cakes",
+        "puffed",
+        "bars",
+        "appetizers",
+        "salty snacks",
+        "nuts",
+    ]
+
+    side_keywords = [
+        "fries",
+        "onion rings",
+        "chips",
+        "crisps",
+        "appetizers",
+        "salty snacks",
+        "crackers",
+        "biscuits",
+    ]
+
+    meal_keywords = [
+        "meal",
+        "meals",
+        "prepared meals",
+        "chicken",
+        "beef",
+        "pork",
+        "fish",
+        "rice",
+        "pasta",
+        "pizza",
+        "salad",
+        "wrap",
+        "sandwich",
+        "frozen meals",
+        "poultry",
+        "dinner",
+        "lunch",
+        "teriyaki",
+    ]
+
+    vegetable_keywords = [
+        "vegetable",
+        "vegetables",
+        "soups",
+        "prepared vegetables",
+        "legumes",
+        "beans",
+    ]
 
     if s == "breakfast":
         if any(k in c for k in breakfast_keywords):
             return 1.0
         if any(k in c for k in snack_keywords):
-            return 0.7
-        if any(k in c for k in lunch_keywords + dinner_keywords):
+            return 0.65
+        if any(k in c for k in meal_keywords):
+            return 0.20
+        if any(k in c for k in vegetable_keywords):
             return 0.35
-        return 0.6
+        return 0.35
 
     if s == "snack":
         if any(k in c for k in snack_keywords):
             return 1.0
         if any(k in c for k in breakfast_keywords):
             return 0.75
-        if any(k in c for k in lunch_keywords + dinner_keywords):
-            return 0.45
-        return 0.6
+        if any(k in c for k in meal_keywords):
+            return 0.20
+        if any(k in c for k in vegetable_keywords):
+            return 0.40
+        return 0.40
 
     if s == "lunch":
-        if any(k in c for k in lunch_keywords + dinner_keywords):
+        if any(k in c for k in meal_keywords):
             return 1.0
-        if any(k in c for k in snack_keywords):
-            return 0.5
+        if any(k in c for k in vegetable_keywords):
+            return 0.75
+        if any(k in c for k in side_keywords):
+            return 0.05
         if any(k in c for k in breakfast_keywords):
-            return 0.35
-        return 0.65
+            return 0.05
+        if any(k in c for k in snack_keywords):
+            return 0.02
+        return 0.15
 
     if s == "dinner":
-        if any(k in c for k in dinner_keywords + lunch_keywords):
+        if any(k in c for k in meal_keywords):
             return 1.0
-        if any(k in c for k in snack_keywords):
-            return 0.4
+        if any(k in c for k in vegetable_keywords):
+            return 0.75
+        if any(k in c for k in side_keywords):
+            return 0.03
         if any(k in c for k in breakfast_keywords):
-            return 0.25
-        return 0.65
+            return 0.02
+        if any(k in c for k in snack_keywords):
+            return 0.01
+        return 0.10
 
-    return 0.6
+    return 0.25
 
 
 def _category_preference_score(category: str, preferences: Optional[dict[str, set[str]]]) -> float:
