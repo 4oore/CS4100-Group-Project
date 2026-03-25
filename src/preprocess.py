@@ -21,6 +21,32 @@ FINAL_COLS = [
     "sodium_mg",
 ]
 
+BAD_CATEGORY_KEYWORDS = [
+    "oil",
+    "olive oil",
+    "olive oils",
+    "vegetable oil",
+    "vegetable oils",
+    "condiments",
+    "sauces",
+    "meal sauces",
+    "spices",
+    "seasonings",
+    "sweeteners",
+    "vinegars",
+    "broths",
+    "bouillons",
+]
+
+BAD_NAME_KEYWORDS = [
+    "sauce",
+    "oil",
+    "seasoning",
+    "condiment",
+    "vinegar",
+    "bouillon",
+]
+
 
 def _parse_args():
     parser = argparse.ArgumentParser(description="Simulated Annealing Meal Planner")
@@ -35,7 +61,7 @@ def _parse_args():
     parser.add_argument(
         "--off_path",
         type=str,
-        default=str(_DATA_DIR / "en.openfoodfacts.org.products.tsv"),
+        default=str(_DATA_DIR / "en.openfoodfacts.org.products.csv"),
         help="path to OFF data TSV",
     )
     parser.add_argument(
@@ -96,6 +122,11 @@ def ingest_OOF(off_path):
                 "categories_en": "category",
             }
         )
+        
+        # Drop low-quality names
+        df = df[df["name"].str.len() >= 4]
+        df = df[~df["name"].str.lower().isin(["nan", "none", "null", "n/a"])]
+        
         df["source"] = "off"
         df["basis_g"] = 100.0
 
@@ -176,7 +207,7 @@ def ingest_USDA(usda_path):
 
 
 def clean(foods):
-    # Drop rows any nutritional value doesn't exist
+    # Drop rows where required nutritional values are missing
     foods = foods.dropna(
         subset=[
             "energy_kcal",
@@ -190,10 +221,36 @@ def clean(foods):
     )
 
     # Drop rows where name doesn't exist
-    foods = foods[foods["name"].notna() & (foods["name"].astype(str).str.strip() != "")]
+    foods = foods[
+        foods["name"].notna() & (foods["name"].astype(str).str.strip() != "")
+    ]
 
-    # Drop dublicates
+    # Normalize text for filtering
+    foods["name"] = foods["name"].astype(str).str.strip()
+    foods["category"] = foods["category"].astype(str).str.strip()
+
+    # Drop duplicate foods
     foods = foods.drop_duplicates(subset=["source", "food_id"]).reset_index(drop=True)
+
+    # Remove foods that are not realistic standalone meal candidates
+    foods = foods[
+        ~foods["category"].str.lower().str.contains(
+            "|".join(BAD_CATEGORY_KEYWORDS),
+            na=False,
+            regex=True,
+        )
+    ]
+
+    foods = foods[
+        ~foods["name"].str.lower().str.contains(
+            "|".join(BAD_NAME_KEYWORDS),
+            na=False,
+            regex=True,
+        )
+    ]
+
+    # Drop extremely tiny-calorie / unrealistic entries
+    foods = foods[foods["energy_kcal"] >= 30].reset_index(drop=True)
 
     return foods
 

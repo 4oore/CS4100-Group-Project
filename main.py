@@ -1,3 +1,4 @@
+from src.genetic_algorithm import genetic_algorithm
 from src.data import load_foods
 from src.simulated_annealing import simulated_annealing
 from src.initialize import greedy_init
@@ -6,8 +7,17 @@ from src.utils import print_plan
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser(description="Simulated Annealing Meal Planner")
+    parser = argparse.ArgumentParser(description="Simulated Annealing + Genetic Algorithm Meal Planner")
 
+    # Optimizer choice
+    parser.add_argument(
+        "--optimizer",
+        type=str,
+        choices=["sa", "ga"],
+        default="sa",
+        help="optimizer to use: simulated annealing (sa) or genetic algorithm (ga)",
+    )
+    
     # Data
     parser.add_argument(
         "--foods_path",
@@ -82,22 +92,20 @@ def _parse_args():
 
     # Penalty weights
     parser.add_argument(
-        "--w_gap", type=float, default=1.0, help="weight for nutrition gap penalty"
+        "--w_nutrition", type=float, default=0.35, help="weight for nutrition score"
     )
     parser.add_argument(
-        "--w_exceed", type=float, default=5.0, help="weight for exceeding upper limits"
+        "--w_variety", type=float, default=0.20, help="weight for variety score"
     )
     parser.add_argument(
-        "--w_variety",
-        type=float,
-        default=2.0,
-        help="weight for category repetition penalty",
+        "--w_compatibility", type=float, default=0.25, help="weight for meal compatibility score"
     )
     parser.add_argument(
-        "--w_portion", type=float, default=0.5, help="weight for portion size penalty"
+        "--w_preference", type=float, default=0.10, help="weight for user preference score"
     )
+    
     parser.add_argument(
-        "--w_balance", type=float, default=1.0, help="weight for calorie balance penalty"
+        "--w_follow", type=float, default=0.10, help="weight for follow-through score"
     )
 
     # Portion bounds
@@ -142,9 +150,36 @@ def _parse_args():
         "--max_steps", type=int, default=10000, help="SA number of steps"
     )
     parser.add_argument("--seed", type=int, default=42, help="random seed")
+    
+    # GA hyperparameters
+    parser.add_argument(
+        "--ga_pop_size", type=int, default=60, help="GA population size"
+    )
+    parser.add_argument(
+        "--ga_generations", type=int, default=100, help="GA number of generations"
+    )
+    parser.add_argument(
+        "--ga_crossover_rate", type=float, default=0.8, help="GA crossover rate"
+    )
+    parser.add_argument(
+        "--ga_mutation_rate", type=float, default=0.3, help="GA mutation rate"
+    )
+    parser.add_argument(
+        "--ga_elite_size", type=int, default=4, help="GA elite size"
+    )
+    parser.add_argument(
+        "--ga_tournament_size", type=int, default=3, help="GA tournament size"
+    )
+    parser.add_argument(
+        "--ga_greedy_fraction",
+        type=float,
+        default=0.5,
+        help="fraction of GA population initialized with greedy_init",
+    )
 
     return parser.parse_args()
 
+    
 
 def main():
     args = _parse_args()
@@ -180,17 +215,51 @@ def main():
         "seed": args.seed,
     }
 
-    penalty_cfg = {
-        "w_gap": args.w_gap,
-        "w_exceed": args.w_exceed,
+    ga_cfg = {
+        "pop_size": args.ga_pop_size,
+        "generations": args.ga_generations,
+        "crossover_rate": args.ga_crossover_rate,
+        "mutation_rate": args.ga_mutation_rate,
+        "elite_size": args.ga_elite_size,
+        "tournament_size": args.ga_tournament_size,
+        "greedy_fraction": args.ga_greedy_fraction,
+        "candidate_pool_size": args.candidate_pool_size,
+        "seed": args.seed,
+    }
+
+    score_cfg = {
+        "w_nutrition": args.w_nutrition,
         "w_variety": args.w_variety,
-        "w_portion": args.w_portion,
-        "w_balance": args.w_balance,
+        "w_compatibility": args.w_compatibility,
+        "w_preference": args.w_preference,
+        "w_follow": args.w_follow,
         "portion_min": args.portion_min,
         "portion_max": args.portion_max,
+        "variety_penalty": 1.2,
     }
 
     foods = load_foods(args.foods_path)
+    
+    preferences = {
+        "liked_categories": {"fruit", "yogurt", "salad", "chicken", "vegetable"},
+        "disliked_categories": {"pork", "soda", "dessert"},
+    }
+    
+    follow_history = {
+        "accepted": {
+            "fruit": 3,
+            "yogurt": 2,
+            "salad": 2,
+            "chicken": 4,
+        },
+        "rejected": {
+            "dessert": 3,
+            "pork": 2,
+            "soda": 4,
+        },
+    }
+    
+    logged_categories: list[str] = []
 
     remaining_slots = [s for s in args.slots if s not in args.slots_done]
 
@@ -200,7 +269,7 @@ def main():
             logged=logged_today,
             targets=targets,
             n_slots=len(remaining_slots),
-            penalty_cfg=penalty_cfg,
+            penalty_cfg=score_cfg,
             candidate_pool_size=args.candidate_pool_size,
             seed=args.seed,
         )
@@ -221,10 +290,47 @@ def main():
                 f"These must match, or use --greedy_init instead."
             )
 
-    best_state = simulated_annealing(
-        foods, logged_today, initial_state, targets, upper_limits, sa_cfg, penalty_cfg
+    if args.optimizer == "sa":
+        best_state = simulated_annealing(
+                foods,
+                logged_today,
+                initial_state,
+                targets,
+                upper_limits,
+                remaining_slots,
+                sa_cfg,
+                score_cfg,
+                preferences=preferences,
+                logged_categories=logged_categories,
+                follow_history=follow_history,
+            )
+    elif args.optimizer == "ga":
+        best_state = genetic_algorithm(
+                foods_df=foods,
+                logged=logged_today,
+                targets=targets,
+                upper_limits=upper_limits,
+                remaining_slots=remaining_slots,
+                score_cfg=score_cfg,
+                n_slots=len(remaining_slots),
+                ga_cfg=ga_cfg,
+                preferences=preferences,
+                logged_categories=logged_categories,
+                follow_history=follow_history,
+            )
+
+    print_plan(
+        best_state,
+        remaining_slots,
+        foods,
+        targets,
+        upper_limits,
+        logged_today,
+        score_cfg,
+        preferences=preferences,
+        logged_categories=logged_categories,
+        follow_history=follow_history,
     )
-    print_plan(best_state, remaining_slots, foods, targets, upper_limits, logged_today)
 
 
 if __name__ == "__main__":

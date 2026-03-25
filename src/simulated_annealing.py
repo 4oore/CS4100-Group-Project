@@ -37,20 +37,46 @@ def simulated_annealing(
     initial_state: list,
     targets: dict,
     upper_limits: dict,
+    remaining_slots: list[str],
     sa_cfg: dict,
-    penalty_cfg: dict,
+    score_cfg: dict,
+    preferences: dict[str, set[str]] | None = None,
+    logged_categories: list[str] | None = None,
+    follow_history: dict[str, dict[str, int]] | None = None,
 ) -> list:
     rng = random.Random(sa_cfg["seed"])
 
     state = copy.deepcopy(initial_state)
     best = copy.deepcopy(state)
-    best_e = energy(state, foods_df, logged, targets, upper_limits, penalty_cfg)
+    best_e = energy(
+        state,
+        remaining_slots,
+        foods_df,
+        logged,
+        targets,
+        upper_limits,
+        score_cfg,
+        preferences=preferences,
+        logged_categories=logged_categories,
+        follow_history=follow_history,
+    )
 
     T = sa_cfg["T_start"]
     curr_e = best_e
     for step in range(sa_cfg["max_steps"]):
         candidate = neighbour(state, foods_df, rng)
-        cand_e = energy(candidate, foods_df, logged, targets, upper_limits, penalty_cfg)
+        cand_e = energy(
+            candidate,
+            remaining_slots,
+            foods_df,
+            logged,
+            targets,
+            upper_limits,
+            score_cfg,
+            preferences=preferences,
+            logged_categories=logged_categories,
+            follow_history=follow_history,
+        )
         delta = cand_e - curr_e
 
         if delta < 0 or rng.random() < math.exp(-delta / T):
