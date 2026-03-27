@@ -227,7 +227,7 @@ def clean(foods):
 
     # Normalize text for filtering
     foods["name"] = foods["name"].astype(str).str.strip()
-    foods["category"] = foods["category"].astype(str).str.strip()
+    foods["category"] = foods["category"].fillna("(unknown)").astype(str).str.strip()
 
     # Drop duplicate foods
     foods = foods.drop_duplicates(subset=["source", "food_id"]).reset_index(drop=True)
