@@ -14,13 +14,9 @@ def neighbour(state: list, foods_df: pd.DataFrame, rng: random.Random) -> list:
         new_food = rng.randrange(len(foods_df))
         s[idx] = (new_food, s[idx][1])
 
-    elif move == "swap":
-        in_plan = {food_id for food_id, _ in s}
-        outside = [i for i in range(len(foods_df)) if i not in in_plan]
-        if outside:
-            idx = rng.randrange(len(s))
-            new_food = rng.choice(outside)
-            s[idx] = (new_food, s[idx][1])
+    elif move == "swap" and len(s) >= 2:
+        i, j = rng.sample(range(len(s)), 2)
+        s[i], s[j] = s[j], s[i]
 
     elif move == "resize":
         idx = rng.randrange(len(s))
