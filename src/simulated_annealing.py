@@ -6,6 +6,12 @@ from .score import energy
 
 
 def neighbour(state: list, foods_df: pd.DataFrame, rng: random.Random) -> list:
+    """
+    Generate a neighbouring state by applying one of three random moves:
+      - replace: swap a slot's food for any random food from the dataset
+      - swap:    exchange two foods between their slots within the plan
+      - resize:  nudge a slot's portion multiplier by a random amount in [-0.5, 0.5]
+    """
     s = copy.deepcopy(state)
     move = rng.choice(["replace", "swap", "resize"])
 
@@ -40,6 +46,30 @@ def simulated_annealing(
     logged_categories: list[str] | None = None,
     follow_history: dict[str, dict[str, int]] | None = None,
 ) -> list:
+    """
+    Run simulated annealing to find the optimal meal plan.
+
+    At each step a neighbour state is generated and accepted if it improves the
+    energy or with probability exp(-delta/T) if it does not, allowing the search
+    to escape local minima. Temperature is decayed by factor alpha each step
+    until T_end, gradually shifting from exploration to exploitation.
+
+    Args:
+        foods_df:          DataFrame of all available foods.
+        logged:            Nutrients already consumed today.
+        initial_state:     Starting list of (food_index, multiplier) pairs.
+        targets:           Daily nutrient targets (e.g. energy_kcal, protein_g).
+        upper_limits:      Daily nutrient upper limits (e.g. sodium_mg, sugar_g).
+        remaining_slots:   Meal slots still to be planned (e.g. ["lunch", "dinner"]).
+        sa_cfg:            SA hyperparameters: T_start, T_end, alpha, max_steps, seed.
+        score_cfg:         Scoring weights and portion bounds.
+        preferences:       Optional liked/disliked category sets.
+        logged_categories: Categories already eaten today, for variety scoring.
+        follow_history:    Accepted/rejected category counts from past sessions.
+
+    Returns:
+        Best state found as a list of (food_index, multiplier) pairs.
+    """
     rng = random.Random(sa_cfg["seed"])
 
     state = copy.deepcopy(initial_state)
