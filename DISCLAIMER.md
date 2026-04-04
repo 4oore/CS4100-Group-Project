@@ -6,3 +6,4 @@ Preprocess - ingesting usda data from multiple files and aggregating was written
 Preprocess - batching data for OFF was ideated and implemented by claude
 utils - pretty print function is written by claude - this is a temporary function
 score - the scoring has been ideated with claude
+simulated_annealing - docstrings were written by claude
