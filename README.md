@@ -12,6 +12,8 @@ Two optimization methods are supported:
 - **Simulated Annealing (SA)** – local search with probabilistic exploration
 - **Genetic Algorithm (GA)** – population-based global search
 
+A **Gaussian Naive Bayes classifier** (implemented from scratch with NumPy) is trained on the food dataset to predict user preference scores based on nutritional features, replacing hardcoded category-keyword rules.
+
 ---
 
 ## Key Features
@@ -22,7 +24,7 @@ Two optimization methods are supported:
   - Nutrition targets (calories, protein, etc.)
   - Variety across meals
   - Meal compatibility (realistic combinations)
-  - User preferences (liked/disliked foods)
+  - User preferences via Gaussian Naive Bayes (trained on nutritional features)
   - Follow-through modeling (foods the user tends to accept/reject)
 - Greedy initialization for fast convergence
 - Support for both SA and GA optimizers
@@ -44,7 +46,7 @@ Where:
 - **NutritionScore**: how close the plan is to macro targets
 - **VarietyScore**: penalizes repeated categories
 - **MealCompatibilityScore**: encourages realistic meal compositions
-- **UserPreferenceScore**: rewards liked foods, penalizes disliked ones
+- **UserPreferenceScore**: predicted by a Gaussian Naive Bayes classifier trained on nutritional features; generalizes to foods in unknown categories
 - **FollowThroughScore**: models whether the user is likely to follow the plan
 
 ---
@@ -167,7 +169,6 @@ Fitness Breakdown
 ---------------------
 	•	Stronger meal realism constraints
 	•	Better mapping between food categories and meal types
-	•	Personalized learning of user preferences over time
 	•	Multi-day planning with grocery optimization
 
 Greedy Initialization (initialize.py)
