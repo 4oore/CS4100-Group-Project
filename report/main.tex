@@ -54,15 +54,15 @@
 
 % ===== TITLE BLOCK =====
 \begin{center}
-  {\Large\bfseries\color{headcolor} Project Title Here}\\[4pt]
-  {\normalsize Member 1, Member 2, Member 3, Member 4}\\[2pt]
+  {\Large\bfseries\color{headcolor} Diet Planner App}\\[4pt]
+  {\normalsize Ekrem Karakas, Member 2, Member 3, Member 4}\\[2pt]
 \end{center}
 
 \vspace{4pt}
 
 % ===== 1. MOTIVATION & PROBLEM STATEMENT =====
 \section{Motivation \& Problem Statement}
-\begin{tcolorbox}[sectionbox, height=4.6cm, valign=top]
+\begin{tcolorbox}[sectionbox, height=12cm, valign=top]
   % --> REMOVE THE \placeholder ENV BELOW, AND ADD YOUR OWN TEXT  <-- %
   \placeholder{%
     Describe the real-world problem your project addresses and explain
@@ -71,6 +71,12 @@
     question or engineering goal in one clear sentence.
     Cite relevant prior work or context that frames the problem
     (1--2 references are sufficient). Aim for roughly 8--12 sentences.}
+
+TODO - GOT FROM PROPOSAL MIGHT NEED UPDATING
+
+Balancing all the various micro and macronutrients can be a challenge, with different foods all having different amounts of each. Because there aren’t good ways to ingest just one type of nutrient, it can be difficult to balance your diet such that every daily recommendation is met without going over or under. Many meal-planning tools generate a static daily or weekly plan that assumes the user will follow it exactly. In practice, people often deviate from their plans by eating unplanned meals or snacks, which can lead to nutritional imbalance.
+Existing tools like MacroFactor can help by generating “a dynamic nutrition plan that adjusts your diet to fit your metabolism”, but following a strict plan may not be the best option if some nutrients are unplanned, but consumed anyway. A lot of these apps also rely heavily on tracking rather than making recommendations, such as MacroFactor advertising that the app can be used to “track vitamins and minerals, set custom targets, and dive into rich analytics”. While providing this information can be useful, applying machine learning on top of this can generate optimal nutritional feedback dynamically. Hungryroot is another existing tool, a personalized grocery delivery and meal recommendation service designed to simplify healthy eating. When users sign up, they take a quiz about their dietary preferences, nutritional goals, and food dislikes. Based on these inputs, Hungryroot curates a weekly selection of grocery items and simple recipes tailored to the user’s profile. The platform blends grocery delivery with meal suggestions so that users receive ingredients and recipe ideas to match their overall preferences and goals. However, its recommendations are largely static for the week and do not adjust based on what the user actually eats throughout the day.
+We propose to build a dynamic meal planning system that updates its recommendations throughout the day based on meals the user manually logs. After each logged meal, the system recalculates remaining nutritional needs and adjusts the plan for the rest of the day to better meet dietary guidelines and user constraints. The goal is to help users make better follow-up choices rather than expecting perfect adherence to an initial plan. To accomplish this we plan on using a matrix based optimization machine learning algorithm such as naive bayes classifier. We plan on training our machine learning model on publicly available nutritional datasets such as this one from Kaggle.
 \end{tcolorbox}
 
 % ===== 2. APPROACH =====
@@ -86,6 +92,15 @@
     (e.g., PyTorch, Mesa, Gymnasium, PettingZoo).
     Clearly state any assumptions or scope limitations.
     Aim for roughly 10--15 sentences or equivalent with an optional figure.}
+
+    Preprocessing
+
+    We are pulling data from two sources (USDA Foundation Foods and Open Food Facts). The data is normalized to a per 100g basis, cleaned by dropping incomplete or unrealistic rows, and filtered down to 10,000 foods.
+
+    Simulated Annealing
+
+    The implementation represents a meal as a tuple of (food\_index, multiplier). The meal plan is a list of meals, one per meal slot. The state is initialized using the greedy-init algorithm. At each step, one of three neighbor moves is applied. Replace swaps a slot's food for any food from the dataset. Swap exchanges two foods between their slots. Resize updates a meal's multiplier by a random delta taken from a uniform distribution between -0,5 and 0,5. Each candidate is evaluated using the energy function (1 - fitness function). Better neighboring states are always accepted while worse plans are accepted probabilistically based on the current temperature that decays geometrically by time.
+
 \end{tcolorbox}
 
 % ===== 3. KEY RESULTS =====
@@ -136,7 +151,7 @@
     \toprule
     \textbf{Member} & \textbf{Primary Contributions} & \textbf{Approx.\ \%} \\
     \midrule
-    Member 1 & \placeholder{e.g., System design, agent logic}          & 20\% \\
+    Ekrem Karakas & \placeholder{Preprocessing Data, Simulated Annealing, Energy Function}          & 20\% \\
     Member 2 & \placeholder{e.g., Data pipeline, evaluation scripts}   & 20\% \\
     Member 3 & \placeholder{e.g., Environment design and implementation} & 20\% \\
     Member 4 & \placeholder{e.g., Data pipeline, evaluation scripts}  & 20\% \\
@@ -149,11 +164,11 @@
 \section{Repository \& References}
 \begin{tcolorbox}[sectionbox, height=4.5cm, valign=top]
   \textbf{GitHub Repository:}
-  \placeholder{\href{https://github.com/your-org/your-repo}%
-       {\texttt{https://github.com/your-org/your-repo}}}\\
+  \placeholder{\href{https://github.com/4oore/CS4100-Group-Project}%
+       {\texttt{https://github.com/4oore/CS4100-Group-Project}}}\\
     \placeholder{Ensure repo is public, or add instructor as a collaborator.}\vspace{1pt}
 
-  \textbf{Project Tracker:} \placeholder{\href{https://github.com/your-org/your-repo}{\texttt{https://github.com/your-org/projects/your-project}}}
+  \textbf{Project Tracker:} \placeholder{\href{https://github.com/users/4oore/projects/1}{\texttt{https://github.com/users/4oore/projects/1}}}
 
   \vspace{6pt}
   \textbf{Key References:}
