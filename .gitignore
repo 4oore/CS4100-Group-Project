@@ -9,3 +9,5 @@ dist
 temp/
 notebooks
 .DS_Store
+report/out/*
+!report/out/main.pdf

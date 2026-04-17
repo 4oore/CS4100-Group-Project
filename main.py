@@ -2,6 +2,7 @@ from src.genetic_algorithm import genetic_algorithm
 from src.data import load_foods
 from src.simulated_annealing import simulated_annealing
 from src.initialize import greedy_init
+from src.naive_bayes import train_preference_classifier, predict_preference_scores
 import argparse
 from src.utils import print_plan
 
@@ -239,11 +240,16 @@ def main():
     }
 
     foods = load_foods(args.foods_path)
-    
+
     preferences = {
         "liked_categories": {"fruit", "yogurt", "salad", "chicken", "vegetable"},
         "disliked_categories": {"pork", "soda", "dessert"},
     }
+
+    nb_clf = train_preference_classifier(foods, preferences)
+    nb_scores = predict_preference_scores(foods, nb_clf)
+    foods = foods.copy()
+    foods["nb_preference_score"] = nb_scores
     
     follow_history = {
         "accepted": {

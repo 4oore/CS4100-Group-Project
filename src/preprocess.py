@@ -61,7 +61,7 @@ def _parse_args():
     parser.add_argument(
         "--off_path",
         type=str,
-        default=str(_DATA_DIR / "en.openfoodfacts.org.products.csv"),
+        default=str(_DATA_DIR / "en.openfoodfacts.org.products.tsv"),
         help="path to OFF data TSV",
     )
     parser.add_argument(
@@ -122,11 +122,11 @@ def ingest_OOF(off_path):
                 "categories_en": "category",
             }
         )
-        
+
         # Drop low-quality names
         df = df[df["name"].str.len() >= 4]
         df = df[~df["name"].str.lower().isin(["nan", "none", "null", "n/a"])]
-        
+
         df["source"] = "off"
         df["basis_g"] = 100.0
 

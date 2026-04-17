@@ -5,8 +5,6 @@ import pandas as pd
 
 State = list[tuple[int, float]]  # List of (food_id, multiplier) pairs
 
-# ********* GENETIC ALGORITHM SCORING FUNCTIONS *********
-
 def _safe_normalized_closeness(actual: float, target: float) -> float:
     """
     Returns a score in [0, 1].
@@ -38,7 +36,7 @@ def _category_to_slot_score(name: str, category: str, slot: str) -> float:
     """
     c = category.lower()
     s = slot.lower()
-    
+
     text = f"{name} {category}".lower()
 
     breakfast_keywords = [
@@ -291,16 +289,24 @@ def user_preference_score(
     preferences: Optional[dict[str, set[str]]] = None,
 ) -> float:
     """
-    Score in [0, 1] based on simple liked/disliked category keywords.
+    Score in [0, 1] reflecting predicted user preference for each food.
+
+    If foods_df contains a precomputed "nb_preference_score" column (populated
+    by the Gaussian Naive Bayes classifier in src/naive_bayes.py), that
+    probability is used directly.  Otherwise falls back to the rule-based
+    liked/disliked category lookup.
     """
     if not state:
         return 0.0
 
+    use_nb = "nb_preference_score" in foods_df.columns
     scores: list[float] = []
     for food_id, _ in state:
         row = foods_df.iloc[food_id]
-        category = str(row["category"])
-        scores.append(_category_preference_score(category, preferences))
+        if use_nb:
+            scores.append(float(row["nb_preference_score"]))
+        else:
+            scores.append(_category_preference_score(str(row["category"]), preferences))
 
     return sum(scores) / len(scores)
 
