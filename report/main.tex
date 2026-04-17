@@ -63,28 +63,26 @@
 % ===== 1. MOTIVATION & PROBLEM STATEMENT =====
 \section{Motivation \& Problem Statement}
 \begin{tcolorbox}[sectionbox, height=4.6cm, valign=top]
-  % --> REMOVE THE \placeholder ENV BELOW, AND ADD YOUR OWN TEXT  <-- %
-  Balancing daily nutritional intake is challenging because foods vary widely in their macro- and micronutrient composition,
-  making it difficult for individuals to meet dietary targets without exceeding or falling short in key nutrients. Most existing
-  meal-planning tools generate static daily or weekly plans that assume perfect adherence, even though people routinely deviate by
-  snacking, eating out, or adjusting portion sizes. When these deviations occur, popular apps such as MacroFactor primarily provide
-  tracking and analytics rather than adaptive guidance that responds to what the user actually consumed. Similarly, services like
-  Hungryroot offer personalized weekly grocery and recipe recommendations, but these suggestions remain fixed and do not update throughout
-  the day as eating behavior changes. This creates a gap between planned and real-world dietary patterns, often leading to nutritional
-  imbalance or unmet goals. Our project addresses this gap by developing a dynamic meal-planning system that recalculates the remaining
-  nutritional budget after each logged meal. The system treats consumed foods as fixed constraints and re-optimizes the rest of the day
-  using stochastic search methods such as simulated annealing and genetic algorithms. This reframes meal planning as a continuous multi-objective
-  optimization problem that balances nutrition, variety, user preferences, and realistic meal compatibility. The core research question
-  guiding this work is: \textbf{How can we design an adaptive meal-planning algorithm that updates throughout the day to recommend
+  Balancing daily nutritional intake is challenging because foods vary widely in their macro- and micronutrient composition, 
+  making it difficult for individuals to meet dietary targets without exceeding or falling short in key nutrients. Most existing 
+  meal-planning tools generate static daily or weekly plans that assume perfect adherence, even though people routinely deviate by 
+  snacking, eating out, or adjusting portion sizes. When these deviations occur, popular apps such as MacroFactor primarily provide 
+  tracking and analytics rather than adaptive guidance that responds to what the user actually consumed. Similarly, services like 
+  Hungryroot offer personalized weekly grocery and recipe recommendations, but these suggestions remain fixed and do not update throughout 
+  the day as eating behavior changes. This creates a gap between planned and real-world dietary patterns, often leading to nutritional 
+  imbalance or unmet goals. Our project addresses this gap by developing a dynamic meal-planning system that recalculates the remaining 
+  nutritional budget after each logged meal. The system treats consumed foods as fixed constraints and re-optimizes the rest of the day 
+  using stochastic search methods such as simulated annealing and genetic algorithms. This reframes meal planning as a continuous multi-objective 
+  optimization problem that balances nutrition, variety, user preferences, and realistic meal compatibility. The core research question 
+  guiding this work is: \textbf{How can we design an adaptive meal-planning algorithm that updates throughout the day to recommend 
   nutritionally balanced, realistic, and user-aligned meals after each logged food choice?}
 \end{tcolorbox}
 
 % ===== 2. APPROACH =====
 \section{Approach}
 \begin{tcolorbox}[sectionbox, height=7.0cm, valign=top]
-% --> REMOVE THE \placeholder ENV BELOW, AND ADD YOUR OWN TEXT  <-- %
-  Our system follows a rolling-horizon optimization framework that updates meal recommendations dynamically based on what the user has already eaten.
-  We begin by preprocessing two large datasets, USDA Foundation Foods and OpenFoodFacts, normalizing all entries to a per-100g basis, removing incomplete
+  Our system follows a rolling-horizon optimization framework that updates meal recommendations dynamically based on what the user has already eaten. 
+  We begin by preprocessing two large datasets, USDA Foundation Foods and OpenFoodFacts, normalizing all entries to a per-100g basis, removing incomplete 
   or unrealistic foods, filtering out non-standalone items, and capping categories to ensure variety, resulting in a cleaned dataset of roughly 10,000 foods.
   Logged meals are treated as fixed constraints, and the remaining nutrient budget is passed into a greedy initialization module that constructs a strong
   starting plan by sampling candidate foods, estimating optimal portion multipliers, and applying soft penalties to discourage repeated categories.
@@ -104,16 +102,15 @@
 % ===== 3. KEY RESULTS =====
 \section{Key Results}
 \begin{tcolorbox}[sectionbox, height=8cm, valign=top]
-% --> REMOVE THE \placeholder ENV BELOW, AND ADD YOUR OWN TEXT  <-- %
-  Across all the experiments, the Genetic Algorithm (GA) demonstrated superior performance relative to Simulated Annealing (SA) in optimizing daily meal plans.
-  Using greedy initialization, GA achieved final fitness scores of 0.923, 0.906, and 0.926 across three independent runs, corresponding to low energy values
-  between 0.075 and 0.094. In contrast, SA converged to lower fitness values of 0.855, 0.867, and 0.842, with energy values between 0.133 and 0.158.
-  Notably, SA had an early plateau around step 2000, indicating that the cooling schedule limited its ability to escape local minima despite additional iterations.
-  Comparing the two methods further highlights this disparity: GA attained an average final fitness of 0.918, exceeding SA’s average of 0.855 by approximately 7.4\%.
-  These results suggest that population-based search is more effective for this multi-objective optimization problem, as GA continues to explore various paths
-  and avoids converging early. Additionally, GA-generated meal plans achieved higher variety and stronger meal-type compatibility, often reaching maximal
-  sub-scores in these dimensions. SA performed well during the initial exploration phase but was less capable of refining solutions once the temperature decreased,
-  consistent with expectations for single-path stochastic search. Overall, the findings validate the system’s design choices and demonstrate that combining
+  Across all the experiments, the Genetic Algorithm (GA) demonstrated superior performance relative to Simulated Annealing (SA) in optimizing daily meal plans. 
+  Using greedy initialization, GA achieved final fitness scores of 0.923, 0.906, and 0.926 across three independent runs, corresponding to low energy values 
+  between 0.075 and 0.094. In contrast, SA converged to lower fitness values of 0.855, 0.867, and 0.842, with energy values between 0.133 and 0.158. 
+  Notably, SA had an early plateau around step 2000, indicating that the cooling schedule limited its ability to escape local minima despite additional iterations. 
+  Comparing the two methods further highlights this disparity: GA attained an average final fitness of 0.918, exceeding SA’s average of 0.855 by approximately 7.4\%. 
+  These results suggest that population-based search is more effective for this multi-objective optimization problem, as GA continues to explore various paths 
+  and avoids converging early. Additionally, GA-generated meal plans achieved higher variety and stronger meal-type compatibility, often reaching maximal 
+  sub-scores in these dimensions. SA performed well during the initial exploration phase but was less capable of refining solutions once the temperature decreased, 
+  consistent with expectations for single-path stochastic search. Overall, the findings validate the system’s design choices and demonstrate that combining 
   greedy initialization with GA yields the most reliable and nutritionally comprehensive meal plans.
 
 \end{tcolorbox}
@@ -124,28 +121,25 @@
 \includegraphics[width=0.42\linewidth]{chart_sa_convergence.png}\hfill
 \includegraphics[width=0.42\linewidth]{chart_ga_convergence.png}
   \\
-  % --> REMOVE THE \placeholder ENV BELOW, AND ADD YOUR OWN TEXT  <-- %
 \end{tcolorbox}
 
 % ===== 4. CHALLENGES & LESSONS LEARNED =====
 \section{Challenges \& Lessons Learned}
 \begin{tcolorbox}[sectionbox, height=4.4cm, valign=top]
-% --> REMOVE THE \placeholder ENV BELOW, AND ADD YOUR OWN TEXT  <-- %
-  One challenge we encountered was that early versions produced unrealistic portion sizes, such as breakfasts that were disproportionately large
-  or dinners that were implausibly small. This issue stemmed from the optimizer assigning extreme multipliers to foods with unusual calorie densities.
-  We mitigated this issue by enforcing strict \texttt{portion\_min} and \texttt{portion\_max} bounds in both the greedy initializer and the optimization algorithms,
-  which stabilized serving sizes across all meal slots. Another challenge involved incorporating user preferences in a way that generalized beyond simple category matching.
-  Our initial rule-based approach proved too rigid, so we implemented a Gaussian Naive Bayes classifier trained on nutritional features to generate preference probabilities
-  for all foods, significantly improving personalization. We also faced organizational challenges in coordinating preprocessing, initialization, scoring, and optimization modules,
-  which required consistent data formats and shared configuration parameters. A key lesson learned was the importance of clear communication and division of responsibilities within the team,
-  especially when multiple components needed to integrate seamlessly. More broadly, we found that multi-objective optimization requires careful tuning of scoring weights,
+  One challenge we encountered was that early versions produced unrealistic portion sizes, such as breakfasts that were disproportionately large 
+  or dinners that were implausibly small. This issue stemmed from the optimizer assigning extreme multipliers to foods with unusual calorie densities. 
+  We mitigated this issue by enforcing strict \texttt{portion\_min} and \texttt{portion\_max} bounds in both the greedy initializer and the optimization algorithms, 
+  which stabilized serving sizes across all meal slots. Another challenge involved incorporating user preferences in a way that generalized beyond simple category matching. 
+  Our initial rule-based approach proved too rigid, so we implemented a Gaussian Naive Bayes classifier trained on nutritional features to generate preference probabilities 
+  for all foods, significantly improving personalization. We also faced organizational challenges in coordinating preprocessing, initialization, scoring, and optimization modules, 
+  which required consistent data formats and shared configuration parameters. A key lesson learned was the importance of clear communication and division of responsibilities within the team, 
+  especially when multiple components needed to integrate seamlessly. More broadly, we found that multi-objective optimization requires careful tuning of scoring weights, 
   as small adjustments can meaningfully alter algorithm behavior. These insights will guide any possible future extensions, particularly for multi-day planning and more complex dietary constraints.
 \end{tcolorbox}
 
 % ===== 5. INDIVIDUAL CONTRIBUTIONS =====
 \section{Individual Contributions}
 \begin{tcolorbox}[sectionbox, height=4.3cm, valign=top]
-% --> REMOVE THE \placeholder ENV BELOW BEFORE SUBMISSION  <-- %
   \vspace{4pt}
   \centering
   \begin{tabularx}{0.95\textwidth}{l X c}
