@@ -5,8 +5,6 @@ import pandas as pd
 
 State = list[tuple[int, float]]  # List of (food_id, multiplier) pairs
 
-# ********* GENETIC ALGORITHM SCORING FUNCTIONS *********
-
 def _safe_normalized_closeness(actual: float, target: float) -> float:
     """
     Returns a score in [0, 1].
@@ -38,7 +36,7 @@ def _category_to_slot_score(name: str, category: str, slot: str) -> float:
     """
     c = category.lower()
     s = slot.lower()
-    
+
     text = f"{name} {category}".lower()
 
     breakfast_keywords = [
