@@ -132,6 +132,12 @@ python main.py \
   --seed $RANDOM
 ```
 
+### For Windows Computers:
+python main.py --optimizer sa --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack
+python main.py --optimizer sa --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack --slots_done breakfast
+python main.py --optimizer ga --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack --slots_done breakfast
+
+
 ### IMportant Arguments
 	•	--optimizer: sa or ga
 	•	--greedy_init: auto-generate starting plan (recommended)
