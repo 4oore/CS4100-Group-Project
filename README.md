@@ -87,13 +87,16 @@ pip install deep-translator
 
 ### 2. Download datasets
 Download:
-	•	USDA FoodData Central (Foundation Foods)
-	•	OpenFoodFacts dataset
+	•	USDA FoodData Central (Foundation Foods) https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_2025-12-18.zip
+	•	OpenFoodFacts dataset https://www.kaggle.com/datasets/openfoodfacts/world-food-facts
 Place them inside:
 
 ```bash
 data/
 ```
+
+such that the relative path of the FoodData dataset folder is data\FoodData_Central_foundation_food_csv_2025-12-18
+and the OpenFoodFacts .tsv file is data\en.openfoodfacts.org.products.tsv
 
 ### 3. Preprocess data
 ```bash
