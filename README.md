@@ -78,11 +78,7 @@ Where:
 ### 1. Install dependencies
 
 ```bash
-pip install pandas numpy
-```
-
-```bash
-pip install deep-translator
+uv sync
 ```
 
 ### 2. Download datasets
@@ -100,7 +96,7 @@ and the OpenFoodFacts .tsv file is data\en.openfoodfacts.org.products.tsv
 
 ### 3. Preprocess data
 ```bash
-python src/preprocess.py
+uv run python src/preprocess.py
 ```
 This generates:
 ```bash
@@ -112,33 +108,31 @@ data/processed/foods.csv
 ### Run with Simulated Annealing
 
 ```bash
-python main.py \
+uv run python main.py \
   --optimizer sa \
   --foods_path data/processed/foods.csv \
   --greedy_init \
   --slots breakfast lunch dinner snack \
   --slots_done breakfast
-  --seed $RANDOM 
 ```
 
 ### Run with Genetic Algorithm
 ```bash
-python main.py \
+uv run python main.py \
   --optimizer ga \
   --foods_path data/processed/foods.csv \
   --greedy_init \
   --slots breakfast lunch dinner snack \
-  --slots_done breakfast \
-  --seed $RANDOM
+  --slots_done breakfast
 ```
 
 ### For Windows Computers:
-python main.py --optimizer sa --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack
-python main.py --optimizer sa --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack --slots_done breakfast
-python main.py --optimizer ga --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack --slots_done breakfast
+uv run python main.py --optimizer sa --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack
+uv run python main.py --optimizer sa --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack --slots_done breakfast
+uv run python main.py --optimizer ga --foods_path data/processed/foods.csv --greedy_init --slots breakfast lunch dinner snack --slots_done breakfast
 
 
-### IMportant Arguments
+### Important Arguments
 	•	--optimizer: sa or ga
 	•	--greedy_init: auto-generate starting plan (recommended)
 	•	--slots: all meal slots
@@ -174,7 +168,7 @@ Fitness Breakdown
 	•	Meal compatibility is currently heuristic-based
 	•	Genetic Algorithm typically performs better than Simulated Annealing for this problem
 
-## Future IMprovements
+## Future Improvements
 ---------------------
 	•	Stronger meal realism constraints
 	•	Better mapping between food categories and meal types
@@ -204,30 +198,6 @@ For each remaining meal slot:
 5. Pick the lowest-scoring candidate and add it to the plan.
 6. Subtract that food's nutrient contribution from the remaining
    budget before moving on to the next slot.
-
-
-Usage
------
-
-Call greedy_init() directly:
-
-    from src.initialize import greedy_init
-
-    initial_state = greedy_init(
-        foods_df=foods,
-        logged=logged_today,
-        targets=targets,
-        n_slots=len(remaining_slots),
-        penalty_cfg=penalty_cfg,
-        candidate_pool_size=50,  # optional, default 50
-        seed=42,                 # optional, default 42
-    )
-
-Or pass --greedy_init when running main.py:
-
-    python main.py --greedy_init
-
-This replaces the need to supply --initial_state manually.
 
 
 Parameters
